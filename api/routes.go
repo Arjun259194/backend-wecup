@@ -8,4 +8,5 @@ func setRoutes(server *fiber.App) {
 
 func authRoutes(server *fiber.App) {
 	server.Post("/auth/register", controller.RegisterController)
+	server.Post("/auth/login", controller.LoginController)
 }
