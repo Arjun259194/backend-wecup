@@ -1,12 +1,22 @@
 package api
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 func setRoutes(server *fiber.App) {
-	authRoutes(server)
+	setAuthRoutes(server)
+	setUserRoutes(server)
 }
 
-func authRoutes(server *fiber.App) {
-	server.Post("/auth/register", controller.RegisterController)
-	server.Post("/auth/login", controller.LoginController)
+func setAuthRoutes(server *fiber.App) {
+	auth := server.Group("/auth")
+	auth.Post("/register", controller.RegisterController)
+	auth.Post("/login", controller.LoginController)
+	auth.Post("/logout", controller.LogoutController)
+}
+
+func setUserRoutes(server *fiber.App) {
+	user := server.Group("/user", controller.JWTMiddleware)
+	user.Get("/:id", controller.GetUserController)
 }

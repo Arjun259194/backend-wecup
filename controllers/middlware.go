@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func JWTMiddleware(c *fiber.Ctx) error {
+func (ctrl *Controller) JWTMiddleware(c *fiber.Ctx) error {
 	tokenCookie := c.Cookies("accessToken")
 	if tokenCookie == "" {
 		return utils.SendErrResponse(nil, "Token not found", fiber.StatusUnauthorized, c)

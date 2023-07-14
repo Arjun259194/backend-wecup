@@ -64,7 +64,7 @@ func (ctrl *Controller) LoginController(c *fiber.Ctx) error {
 
 	var foundUser types.User
 
-	if err := result.Decode(foundUser); err != nil {
+	if err := result.Decode(&foundUser); err != nil {
 		return utils.SendErrResponse(err, "Error while decoding user data", fiber.StatusInternalServerError, c)
 	}
 
@@ -83,4 +83,10 @@ func (ctrl *Controller) LoginController(c *fiber.Ctx) error {
 			"token": token,
 		},
 	})
+}
+
+func (ctrl *Controller) LogoutController(c *fiber.Ctx) error {
+	emptyCookie := utils.EmptyCookie()
+	c.Cookie(emptyCookie)
+	return c.SendStatus(fiber.StatusOK)
 }
