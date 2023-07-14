@@ -8,7 +8,6 @@ import (
 	"github.com/Arjun259194/wecup-go/utils"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func (ctrl *Controller) RegisterController(c *fiber.Ctx) error {
@@ -53,19 +52,14 @@ func (ctrl *Controller) LoginController(c *fiber.Ctx) error {
 		"email": reqBody.Email,
 	}
 
-	result := ctrl.Storage.FindOneUser(filter)
+	foundUser, err := ctrl.Storage.FindOneUser(filter)
 
-	if err := result.Err(); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return utils.SendErrResponse(err, "No documents found", fiber.StatusNotFound, c)
-		}
-		return utils.SendErrResponse(err, "Error while fetching data from database", fiber.StatusInternalServerError, c)
+	if err != nil {
+		sendUserErrResponse(err, c)
 	}
 
-	var foundUser types.User
-
-	if err := result.Decode(&foundUser); err != nil {
-		return utils.SendErrResponse(err, "Error while decoding user data", fiber.StatusInternalServerError, c)
+	if err := utils.ComparePassword(reqBody.Password, foundUser.Password); err != nil {
+		return utils.SendErrResponse(err, "incorrect password", fiber.StatusUnauthorized, c)
 	}
 
 	token, err := utils.GenerateToken(foundUser.ID)

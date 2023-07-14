@@ -14,6 +14,26 @@ type User struct {
 	Following []primitive.ObjectID `json:"following" bson:"following"`
 }
 
+type UserResponse struct {
+	ID        primitive.ObjectID   `json:"id" bson:"_id"`
+	Name      string               `json:"name" bson:"name"`
+	Email     string               `json:"email" bson:"email"`
+	Gender    string               `json:"gender" bson:"gender"`
+	Followers []primitive.ObjectID `json:"followers" bson:"followers"`
+	Following []primitive.ObjectID `json:"following" bson:"following"`
+}
+
+func (u User) GetResponse() UserResponse {
+	return UserResponse{
+		ID:        u.ID,
+		Name:      u.Name,
+		Email:     u.Email,
+		Gender:    u.Gender,
+		Followers: u.Followers,
+		Following: u.Following,
+	}
+}
+
 func NewUser(name, email, password, gender string) User {
 	return User{
 		Name:      name,

@@ -14,3 +14,4 @@ func SendErrResponse(err error, message string, status int, c *fiber.Ctx) error 
 		Message: message,
 	})
 }
+

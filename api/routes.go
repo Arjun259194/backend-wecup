@@ -18,5 +18,6 @@ func setAuthRoutes(server *fiber.App) {
 
 func setUserRoutes(server *fiber.App) {
 	user := server.Group("/user", controller.JWTMiddleware)
+	user.Get("/profile", controller.GetProfile)
 	user.Get("/:id", controller.GetUserController)
 }
