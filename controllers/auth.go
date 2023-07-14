@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/Arjun259194/wecup-go/types"
 	"github.com/Arjun259194/wecup-go/utils"
@@ -16,12 +15,10 @@ func (ctrl *Controller) RegisterController(c *fiber.Ctx) error {
 	var reqBodyStruct types.RegisterRequest
 
 	if err := json.Unmarshal(reqBody, &reqBodyStruct); err != nil {
-		fmt.Println("unable to unmarshal")
 		return utils.SendErrResponse(err, "Please check request body", fiber.StatusBadRequest, c)
 	}
 
 	if err := val.Struct(reqBodyStruct); err != nil {
-		fmt.Println("data not valid")
 		return utils.SendErrResponse(err, "Request body not valid", fiber.StatusBadRequest, c)
 	}
 
@@ -30,7 +27,7 @@ func (ctrl *Controller) RegisterController(c *fiber.Ctx) error {
 		return utils.SendErrResponse(err, "Error while hashing password", fiber.StatusInternalServerError, c)
 	}
 
-	newUser := types.NewUser(reqBodyStruct.Username, reqBodyStruct.Email, hashPass, reqBodyStruct.Gender)
+	newUser := types.NewUser(reqBodyStruct.Name, reqBodyStruct.Email, hashPass, reqBodyStruct.Gender)
 
 	if _, err := ctrl.Storage.AddUser(newUser); err != nil {
 		return utils.SendErrResponse(err, "Error while inserting into database", fiber.StatusInternalServerError, c)
@@ -48,14 +45,15 @@ func (ctrl *Controller) LoginController(c *fiber.Ctx) error {
 		return utils.SendErrResponse(err, "Please check request body", fiber.StatusBadRequest, c)
 	}
 
-	filter := bson.M{
-		"email": reqBody.Email,
+	if err := val.Struct(reqBody); err != nil {
+		return utils.SendErrResponse(err, "Request body not valid", fiber.StatusBadRequest, c)
 	}
 
+	filter := bson.M{"email": reqBody.Email}
 	foundUser, err := ctrl.Storage.FindOneUser(filter)
 
 	if err != nil {
-		sendUserErrResponse(err, c)
+		utils.UserErrorHandler(err, c)
 	}
 
 	if err := utils.ComparePassword(reqBody.Password, foundUser.Password); err != nil {

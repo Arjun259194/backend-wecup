@@ -5,7 +5,6 @@ import (
 	"github.com/Arjun259194/wecup-go/utils"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func (ctrl *Controller) GetProfile(c *fiber.Ctx) error {
@@ -13,7 +12,7 @@ func (ctrl *Controller) GetProfile(c *fiber.Ctx) error {
 	user, err := ctrl.GetUserByID(ID)
 
 	if err != nil {
-		sendUserErrResponse(err, c)
+		utils.UserErrorHandler(err, c)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(types.Response{
@@ -25,7 +24,7 @@ func (ctrl *Controller) GetProfile(c *fiber.Ctx) error {
 func (ctrl *Controller) GetUserController(c *fiber.Ctx) error {
 	strID := c.Params("id")
 
-  // MongoDB uses primitive.ObjectID type for ID
+	// MongoDB uses primitive.ObjectID type for ID
 	ID, err := primitive.ObjectIDFromHex(strID)
 	if err != nil {
 		return utils.SendErrResponse(err, "ID not valid", fiber.StatusBadRequest, c)
@@ -34,7 +33,7 @@ func (ctrl *Controller) GetUserController(c *fiber.Ctx) error {
 	user, err := ctrl.GetUserByID(ID)
 
 	if err != nil {
-		sendUserErrResponse(err, c)
+		utils.UserErrorHandler(err, c)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(types.Response{
@@ -43,12 +42,24 @@ func (ctrl *Controller) GetUserController(c *fiber.Ctx) error {
 	})
 }
 
-func sendUserErrResponse(err error, c *fiber.Ctx) error {
-	var responseStatus, responseMessage = fiber.StatusInternalServerError, "Error while fetching data"
+func (ctrl *Controller) UpdateUserController(c *fiber.Ctx) error {
+	ID := c.Locals("id").(primitive.ObjectID)
 
-	if err == mongo.ErrNoDocuments {
-		responseStatus, responseMessage = fiber.StatusNotFound, "Document not found"
+	reqBody := new(types.UpdateRequest)
+	if err := c.BodyParser(reqBody); err != nil {
+		return utils.SendErrResponse(err, "Please check request body", fiber.StatusBadRequest, c)
 	}
 
-	return utils.SendErrResponse(err, responseMessage, responseStatus, c)
+	if err := val.Struct(reqBody); err != nil {
+		return utils.SendErrResponse(err, "Request body not valid", fiber.StatusBadRequest, c)
+	}
+
+	if err := ctrl.Storage.FindByIDAndUpdateUser(ID, *reqBody); err != nil {
+		return utils.UserErrorHandler(err, c)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(types.Response{
+		Status:       fiber.StatusOK,
+		ResponseData: nil,
+	})
 }
