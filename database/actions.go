@@ -7,6 +7,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func (s *Storage) FindUser(filter bson.M) (cur *mongo.Cursor, err error) {
+	return s.UserModel.Find(s.Ctx, filter)
+}
+
 func (s *Storage) AddUser(user types.User) (*mongo.InsertOneResult, error) {
 	return s.UserModel.InsertOne(s.Ctx, user)
 }
@@ -50,6 +54,38 @@ func (s *Storage) FindByIDAndUpdateUser(ID primitive.ObjectID, body types.Update
 	return nil
 }
 
-func (s *Storage) FindUser(filter bson.M) (cur *mongo.Cursor, err error) {
-	return s.UserModel.Find(s.Ctx, filter)
+// This function will update follower and following status in client and requested user.
+// if isFollowing is false then it will make clientID follow userID and if true then unfollow
+func (s *Storage) FindByIDAndFollowOrUnfollow(userID, clientID primitive.ObjectID, isFollowing bool) error {
+
+	var userUpdateQuery bson.M   // user to follow
+	var clientUpdateQuery bson.M // requesting user
+
+	if isFollowing == true {
+		userUpdateQuery = bson.M{"$pull": bson.M{"followers": clientID}}
+		clientUpdateQuery = bson.M{"$pull": bson.M{"following": userID}}
+	} else {
+		userUpdateQuery = bson.M{"$push": bson.M{"followers": clientID}}
+		clientUpdateQuery = bson.M{"$push": bson.M{"following": userID}}
+	}
+
+	clientFilter := bson.M{
+		"_id": clientID,
+	}
+
+	userFilter := bson.M{
+		"_id": userID,
+	}
+
+	result := s.UserModel.FindOneAndUpdate(s.Ctx, clientFilter, clientUpdateQuery)
+	if err := result.Err(); err != nil {
+		return err
+	}
+
+	result = s.UserModel.FindOneAndUpdate(s.Ctx, userFilter, userUpdateQuery)
+	if err := result.Err(); err != nil {
+		return err
+	}
+
+  return nil
 }

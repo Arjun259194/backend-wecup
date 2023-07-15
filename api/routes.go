@@ -21,4 +21,5 @@ func setUserRoutes(server *fiber.App) {
 	user.Get("/profile", controller.GetProfile)
 	user.Get("/:id", controller.GetUserController)
 	user.Put("/profile/update", controller.UpdateUserController)
+	user.Post("/:id/follow", controller.FollowUserController)
 }

@@ -64,9 +64,33 @@ func (ctrl *Controller) UpdateUserController(c *fiber.Ctx) error {
 	})
 }
 
-// func (ctrl *Controller) FollowUserController(c *fiber.Ctx) error {
-// 	ID, err := utils.GetIDFromParams(c)
-// 	if err != nil {
+func (ctrl *Controller) FollowUserController(c *fiber.Ctx) error {
+	ID, err := utils.GetIDFromParams(c)
+	if err != nil {
+		utils.NotValidIDHandler(c, err)
+	}
+	clientID := c.Locals("id").(primitive.ObjectID)
 
-// 	}
-// }
+	// Client is the user who is sending this request
+	client, err := ctrl.GetUserByID(clientID)
+	if err != nil {
+		utils.SingleUserErrorHandler(err, c)
+	}
+
+	isFollowing := false
+
+	for _, followingID := range client.Following {
+		if followingID == ID {
+			isFollowing = true
+		}
+	}
+
+	if err := ctrl.Storage.FindByIDAndFollowOrUnfollow(ID, clientID, isFollowing); err != nil {
+		return utils.SingleUserErrorHandler(err, c)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(types.Response{
+		Status:       fiber.StatusOK,
+		ResponseData: nil,
+	})
+}
