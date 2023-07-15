@@ -139,3 +139,17 @@ func (s *Storage) FindOnePostByIDAndUpdate(ID primitive.ObjectID, req *types.Upd
 
 	return nil
 }
+
+func (s *Storage) FindOnePostByIDAndDelete(ID primitive.ObjectID) error {
+	filter := bson.M{
+		"_id": ID,
+	}
+
+	result := s.PostModel.FindOneAndDelete(s.Ctx, filter)
+
+	if err := result.Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
