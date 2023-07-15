@@ -9,6 +9,10 @@ func DatabaseInsertionHandler(c *fiber.Ctx, err error) error {
 	return SendErrResponse(err, "Error while inserting into database", fiber.StatusInternalServerError, c)
 }
 
+func DatabaseFetchHandler(c *fiber.Ctx, err error) error {
+	return SendErrResponse(err, "Error while fetching data from database", fiber.StatusInternalServerError, c)
+}
+
 func InvalidRequestBodyHandler(c *fiber.Ctx, err error) error {
 	return SendErrResponse(err, "Request Body Is Not Valid", fiber.StatusBadRequest, c)
 }
@@ -19,6 +23,10 @@ func ReqBodyFailedToDecodeHandler(c *fiber.Ctx, err error) error {
 
 func NotValidIDHandler(c *fiber.Ctx, err error) error {
 	return SendErrResponse(err, "ID not valid", fiber.StatusBadRequest, c)
+}
+
+func FailedToDecodeDataHandler(c *fiber.Ctx, err error) error {
+	return SendErrResponse(err, "Error while decoding data", fiber.StatusInternalServerError, c)
 }
 
 func SingleUserErrorHandler(err error, c *fiber.Ctx) error {

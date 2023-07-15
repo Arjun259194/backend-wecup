@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"context"
+
 	"github.com/Arjun259194/wecup-go/types"
 	"github.com/Arjun259194/wecup-go/utils"
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -44,6 +47,24 @@ func (ctrl *Controller) GetPostController(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(types.Response{
 		Status:       fiber.StatusOK,
 		ResponseData: post})
+}
+
+func (ctrl *Controller) GetPostsController(c *fiber.Ctx) error {
+	cur, err := ctrl.Storage.PostModel.Find(context.Background(), bson.M{})
+	if err != nil {
+		return utils.DatabaseFetchHandler(c, err)
+	}
+	defer cur.Close(context.Background())
+
+	posts := new(types.Posts)
+	if err := cur.All(context.Background(), posts); err != nil {
+		return utils.FailedToDecodeDataHandler(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(types.Response{
+		Status:       fiber.StatusOK,
+		ResponseData: posts,
+	})
 }
 
 func (ctrl *Controller) UpdatePostController(c *fiber.Ctx) error {

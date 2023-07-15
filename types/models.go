@@ -25,6 +25,8 @@ type Post struct {
 	Comments  []Comment            `json:"comments" bson:"comments"`
 }
 
+type Posts []Post
+
 func NewPost(userID primitive.ObjectID, content string) *Post {
 	return &Post{
 		ID:        primitive.NewObjectID(),
