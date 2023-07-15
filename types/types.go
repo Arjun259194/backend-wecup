@@ -22,12 +22,16 @@ type RegisterRequest struct {
 	Email    string `json:"email" validate:"required"`
 }
 
-type UpdateRequest struct {
+type UserUpdateRequest struct {
 	Name   string `json:"name" validate:"required"`
 	Gender string `json:"gender" validate:"required"`
 	Email  string `json:"email" validate:"required"`
 }
 
 type CreatePostRequest struct {
+  Content string `json:"content" validate:"required"`
+}
+
+type UpdatePostRequest struct {
   Content string `json:"content" validate:"required"`
 }

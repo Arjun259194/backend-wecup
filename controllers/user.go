@@ -45,7 +45,7 @@ func (ctrl *Controller) GetUserController(c *fiber.Ctx) error {
 func (ctrl *Controller) UpdateUserController(c *fiber.Ctx) error {
 	ID := c.Locals("id").(primitive.ObjectID)
 
-	reqBody := new(types.UpdateRequest)
+	reqBody := new(types.UserUpdateRequest)
 	if err := c.BodyParser(reqBody); err != nil {
 		return utils.ReqBodyFailedToDecodeHandler(c, err)
 	}

@@ -45,3 +45,24 @@ func (ctrl *Controller) GetPostController(c *fiber.Ctx) error {
 		Status:       fiber.StatusOK,
 		ResponseData: post})
 }
+
+func (ctrl *Controller) UpdatePostController(c *fiber.Ctx) error {
+	ID, err := utils.GetIDFromParams(c)
+	if err != nil {
+		return utils.NotValidIDHandler(c, err)
+	}
+
+	reqBody := new(types.UpdatePostRequest)
+	if err := c.BodyParser(reqBody); err != nil {
+		return utils.ReqBodyFailedToDecodeHandler(c, err)
+	}
+
+	if err := ctrl.Storage.FindOnePostByIDAndUpdate(ID, reqBody); err != nil {
+		return utils.SingleUserErrorHandler(err, c)
+	}
+
+  return c.Status(fiber.StatusOK).JSON(types.Response{
+    Status: fiber.StatusOK,
+    ResponseData: nil,
+  })
+}

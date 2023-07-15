@@ -36,7 +36,7 @@ func (s *Storage) FindOneUser(filter bson.M) (*types.User, error) {
 	return &foundUser, nil
 }
 
-func (s *Storage) FindByIDAndUpdateUser(ID primitive.ObjectID, body types.UpdateRequest) error {
+func (s *Storage) FindByIDAndUpdateUser(ID primitive.ObjectID, body types.UserUpdateRequest) error {
 	filter := bson.M{
 		"_id": ID,
 	}
@@ -119,4 +119,23 @@ func (s *Storage) FindOnePostByID(ID primitive.ObjectID) (*types.Post, error) {
 	}
 
 	return foundPost, nil
+}
+
+func (s *Storage) FindOnePostByIDAndUpdate(ID primitive.ObjectID, req *types.UpdatePostRequest) error {
+	filter := bson.M{
+		"_id": ID,
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"content": req.Content,
+		},
+	}
+
+	result := s.PostModel.FindOneAndUpdate(s.Ctx, filter, update)
+	if err := result.Err(); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -28,5 +28,6 @@ func setUserRoutes(server *fiber.App) {
 func setPostRoutes(server *fiber.App) {
 	post := server.Group("/posts", controller.JWTMiddleware)
 	post.Post("/", controller.CreatePostController)
+  post.Put("/:id", controller.UpdatePostController)
 	post.Get("/:id", controller.GetPostController)
 }
