@@ -57,12 +57,27 @@ func (ctrl *Controller) UpdatePostController(c *fiber.Ctx) error {
 		return utils.ReqBodyFailedToDecodeHandler(c, err)
 	}
 
+	clientID := c.Locals("id").(primitive.ObjectID)
+
+	post, err := ctrl.Storage.FindOnePostByID(ID)
+	if err != nil {
+		return utils.SingleUserErrorHandler(err, c)
+	}
+
+	if post.UserID != clientID {
+		return utils.SendErrResponse(err, "User not authorized", fiber.StatusUnauthorized, c)
+	}
+
 	if err := ctrl.Storage.FindOnePostByIDAndUpdate(ID, reqBody); err != nil {
 		return utils.SingleUserErrorHandler(err, c)
 	}
 
-  return c.Status(fiber.StatusOK).JSON(types.Response{
-    Status: fiber.StatusOK,
-    ResponseData: nil,
-  })
+	return c.Status(fiber.StatusOK).JSON(types.Response{
+		Status:       fiber.StatusOK,
+		ResponseData: nil,
+	})
 }
+
+// func (ctrl *Controller) DeletePostController(c *fiber.Ctx) error {
+
+// }
