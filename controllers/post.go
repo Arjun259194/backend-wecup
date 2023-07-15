@@ -27,6 +27,21 @@ func (ctrl *Controller) CreatePostController(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(types.Response{
 		Status:       fiber.StatusOK,
-		ResponseData: nil,
-	})
+		ResponseData: nil})
+}
+
+func (ctrl *Controller) GetPostController(c *fiber.Ctx) error {
+	ID, err := utils.GetIDFromParams(c)
+	if err != nil {
+		return utils.NotValidIDHandler(c, err)
+	}
+
+	post, err := ctrl.Storage.FindOnePostByID(ID)
+	if err != nil {
+		return utils.SingleUserErrorHandler(err, c)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(types.Response{
+		Status:       fiber.StatusOK,
+		ResponseData: post})
 }

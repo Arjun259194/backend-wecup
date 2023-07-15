@@ -101,3 +101,22 @@ func (s *Storage) CreateNewPost(p types.Post) error {
 	}
 	return nil
 }
+
+func (s *Storage) FindOnePostByID(ID primitive.ObjectID) (*types.Post, error) {
+	filter := bson.M{
+		"_id": ID,
+	}
+
+	resutl := s.PostModel.FindOne(s.Ctx, filter)
+
+	if err := resutl.Err(); err != nil {
+		return nil, err
+	}
+
+	foundPost := new(types.Post)
+	if err := resutl.Decode(foundPost); err != nil {
+		return nil, err
+	}
+
+	return foundPost, nil
+}
