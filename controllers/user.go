@@ -12,7 +12,7 @@ func (ctrl *Controller) GetProfile(c *fiber.Ctx) error {
 	user, err := ctrl.GetUserByID(ID)
 
 	if err != nil {
-		utils.UserErrorHandler(err, c)
+		utils.SingleUserErrorHandler(err, c)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(types.Response{
@@ -27,13 +27,13 @@ func (ctrl *Controller) GetUserController(c *fiber.Ctx) error {
 	// MongoDB uses primitive.ObjectID type for ID
 	ID, err := primitive.ObjectIDFromHex(strID)
 	if err != nil {
-		return utils.SendErrResponse(err, "ID not valid", fiber.StatusBadRequest, c)
+		return utils.NotValidIDHandler(c, err)
 	}
 
 	user, err := ctrl.GetUserByID(ID)
 
 	if err != nil {
-		utils.UserErrorHandler(err, c)
+		utils.SingleUserErrorHandler(err, c)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(types.Response{
@@ -47,15 +47,15 @@ func (ctrl *Controller) UpdateUserController(c *fiber.Ctx) error {
 
 	reqBody := new(types.UpdateRequest)
 	if err := c.BodyParser(reqBody); err != nil {
-		return utils.SendErrResponse(err, "Please check request body", fiber.StatusBadRequest, c)
+		return utils.ReqBodyFailedToDecodeHandler(c, err)
 	}
 
 	if err := val.Struct(reqBody); err != nil {
-		return utils.SendErrResponse(err, "Request body not valid", fiber.StatusBadRequest, c)
+		return utils.InvalidRequestBodyHandler(c, err)
 	}
 
 	if err := ctrl.Storage.FindByIDAndUpdateUser(ID, *reqBody); err != nil {
-		return utils.UserErrorHandler(err, c)
+		return utils.SingleUserErrorHandler(err, c)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(types.Response{
@@ -63,3 +63,10 @@ func (ctrl *Controller) UpdateUserController(c *fiber.Ctx) error {
 		ResponseData: nil,
 	})
 }
+
+// func (ctrl *Controller) FollowUserController(c *fiber.Ctx) error {
+// 	ID, err := utils.GetIDFromParams(c)
+// 	if err != nil {
+
+// 	}
+// }

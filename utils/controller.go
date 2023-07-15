@@ -5,11 +5,11 @@ import (
 
 	"github.com/Arjun259194/wecup-go/types"
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func SendErrResponse(err error, message string, status int, c *fiber.Ctx) error {
-	fmt.Printf("Error - %v", err)
+	fmt.Printf("Error - %v\n", err)
 	return c.Status(status).JSON(types.ErrorResponse{
 		Status:  status,
 		Message: message,
@@ -17,12 +17,7 @@ func SendErrResponse(err error, message string, status int, c *fiber.Ctx) error 
 }
 
 
-func UserErrorHandler(err error, c *fiber.Ctx) error {
-	var responseStatus, responseMessage = fiber.StatusInternalServerError, "Error while fetching data"
-
-	if err == mongo.ErrNoDocuments {
-		responseStatus, responseMessage = fiber.StatusNotFound, "Document not found"
-	}
-
-	return SendErrResponse(err, responseMessage, responseStatus, c)
+func GetIDFromParams(c *fiber.Ctx) (primitive.ObjectID, error) {
+	strID := c.Params("id")
+	return primitive.ObjectIDFromHex(strID)
 }

@@ -10,13 +10,11 @@ import (
 )
 
 func GenerateToken(id primitive.ObjectID) (string, error) {
-	// Create the claims
 	claims := jwt.MapClaims{
 		"id":  id,
 		"exp": time.Now().Add(time.Hour * 24).Unix(), // Set the expiration time
 	}
 
-	// Sign the token with a secret key
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(config.SECRET_TOKEN))
 	if err != nil {

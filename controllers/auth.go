@@ -15,11 +15,11 @@ func (ctrl *Controller) RegisterController(c *fiber.Ctx) error {
 	var reqBodyStruct types.RegisterRequest
 
 	if err := json.Unmarshal(reqBody, &reqBodyStruct); err != nil {
-		return utils.SendErrResponse(err, "Please check request body", fiber.StatusBadRequest, c)
+		return utils.ReqBodyFailedToDecodeHandler(c, err)
 	}
 
 	if err := val.Struct(reqBodyStruct); err != nil {
-		return utils.SendErrResponse(err, "Request body not valid", fiber.StatusBadRequest, c)
+		return utils.InvalidRequestBodyHandler(c, err)
 	}
 
 	hashPass, err := utils.HashPassword(reqBodyStruct.Password)
@@ -42,18 +42,18 @@ func (ctrl *Controller) RegisterController(c *fiber.Ctx) error {
 func (ctrl *Controller) LoginController(c *fiber.Ctx) error {
 	reqBody := new(types.LoginRequest)
 	if err := c.BodyParser(&reqBody); err != nil {
-		return utils.SendErrResponse(err, "Please check request body", fiber.StatusBadRequest, c)
+		return utils.ReqBodyFailedToDecodeHandler(c, err)
 	}
 
 	if err := val.Struct(reqBody); err != nil {
-		return utils.SendErrResponse(err, "Request body not valid", fiber.StatusBadRequest, c)
+		return utils.InvalidRequestBodyHandler(c, err)
 	}
 
 	filter := bson.M{"email": reqBody.Email}
 	foundUser, err := ctrl.Storage.FindOneUser(filter)
 
 	if err != nil {
-		utils.UserErrorHandler(err, c)
+		utils.SingleUserErrorHandler(err, c)
 	}
 
 	if err := utils.ComparePassword(reqBody.Password, foundUser.Password); err != nil {
