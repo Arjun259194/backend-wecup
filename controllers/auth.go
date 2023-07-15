@@ -29,8 +29,8 @@ func (ctrl *Controller) RegisterController(c *fiber.Ctx) error {
 
 	newUser := types.NewUser(reqBodyStruct.Name, reqBodyStruct.Email, hashPass, reqBodyStruct.Gender)
 
-	if _, err := ctrl.Storage.AddUser(newUser); err != nil {
-		return utils.SendErrResponse(err, "Error while inserting into database", fiber.StatusInternalServerError, c)
+	if err := ctrl.Storage.CreateNewUser(newUser); err != nil {
+    return utils.DatabaseInsertionHandler(c,err)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(types.Response{

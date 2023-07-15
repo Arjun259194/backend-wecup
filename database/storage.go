@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -12,7 +13,9 @@ import (
 type Storage struct {
 	ConnectionString string
 	Client           *mongo.Client
+	Database         *mongo.Database
 	UserModel        *mongo.Collection
+	PostModel        *mongo.Collection
 	Ctx              context.Context
 }
 
@@ -39,7 +42,20 @@ func (s *Storage) Connect() {
 	fmt.Println("Ping! Connected to database")
 
 	s.Client = client
-	s.UserModel = client.Database("wecup").Collection("User")
+	s.Database = client.Database("wecup")
+	s.UserModel = s.Database.Collection("User")
+	s.PostModel = s.Database.Collection("Post")
+
+	// Create unique index on email field
+	indexModel := mongo.IndexModel{
+		Keys:    bson.M{"email": 1},
+		Options: options.Index().SetUnique(true),
+	}
+
+	_, err = s.UserModel.Indexes().CreateOne(s.Ctx, indexModel)
+	if err != nil {
+		log.Fatalf("Error while creating unique index on email field - %v", err)
+	}
 }
 
 func (s *Storage) Close() {

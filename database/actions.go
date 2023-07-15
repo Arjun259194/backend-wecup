@@ -11,8 +11,12 @@ func (s *Storage) FindUser(filter bson.M) (cur *mongo.Cursor, err error) {
 	return s.UserModel.Find(s.Ctx, filter)
 }
 
-func (s *Storage) AddUser(user types.User) (*mongo.InsertOneResult, error) {
-	return s.UserModel.InsertOne(s.Ctx, user)
+func (s *Storage) CreateNewUser(user types.User) error {
+	_, err := s.UserModel.InsertOne(s.Ctx, user)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Storage) FindOneUser(filter bson.M) (*types.User, error) {
@@ -87,5 +91,13 @@ func (s *Storage) FindByIDAndFollowOrUnfollow(userID, clientID primitive.ObjectI
 		return err
 	}
 
-  return nil
+	return nil
+}
+
+func (s *Storage) CreateNewPost(p types.Post) error {
+	_, err := s.PostModel.InsertOne(s.Ctx, p)
+	if err != nil {
+		return err
+	}
+	return nil
 }

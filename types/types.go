@@ -5,6 +5,11 @@ type Response struct {
 	ResponseData interface{} `json:"data"`
 }
 
+type ErrorResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
 type LoginRequest struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
@@ -23,7 +28,6 @@ type UpdateRequest struct {
 	Email  string `json:"email" validate:"required"`
 }
 
-type ErrorResponse struct {
-	Status  int    `json:"status"`
-	Message string `json:"message"`
+type CreatePostRequest struct {
+  Content string `json:"content" validate:"required"`
 }

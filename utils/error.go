@@ -5,6 +5,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func DatabaseInsertionHandler(c *fiber.Ctx, err error) error {
+	return SendErrResponse(err, "Error while inserting into database", fiber.StatusInternalServerError, c)
+}
+
 func InvalidRequestBodyHandler(c *fiber.Ctx, err error) error {
 	return SendErrResponse(err, "Request Body Is Not Valid", fiber.StatusBadRequest, c)
 }

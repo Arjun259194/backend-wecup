@@ -7,6 +7,7 @@ import (
 func setRoutes(server *fiber.App) {
 	setAuthRoutes(server)
 	setUserRoutes(server)
+  setPostRoutes(server)
 }
 
 func setAuthRoutes(server *fiber.App) {
@@ -22,4 +23,9 @@ func setUserRoutes(server *fiber.App) {
 	user.Get("/:id", controller.GetUserController)
 	user.Put("/profile/update", controller.UpdateUserController)
 	user.Post("/:id/follow", controller.FollowUserController)
+}
+
+func setPostRoutes(server *fiber.App) {
+	post := server.Group("/posts", controller.JWTMiddleware)
+	post.Post("/", controller.CreatePostController)
 }
