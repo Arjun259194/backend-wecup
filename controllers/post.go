@@ -125,3 +125,37 @@ func (ctrl *Controller) DeletePostController(c *fiber.Ctx) error {
 		ResponseData: nil,
 	})
 }
+
+func (ctrl *Controller) LikePostController(c *fiber.Ctx) error {
+
+	clientID := c.Locals("id").(primitive.ObjectID)
+
+	ID, err := utils.GetIDFromParams(c)
+	if err != nil {
+		return utils.NotValidIDHandler(c, err)
+	}
+
+	post, err := ctrl.Storage.FindOnePostByID(ID)
+	if err != nil {
+		return utils.SingleUserErrorHandler(err, c)
+	}
+
+	isLiked := false
+
+	for _, likerID := range post.Likes {
+		if likerID == clientID {
+			isLiked = true
+		}
+	}
+
+	err = ctrl.Storage.LikeOrUnlikePost(ID, clientID, isLiked)
+
+	if err != nil {
+		return utils.SingleUserErrorHandler(err, c)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(types.Response{
+		Status:       fiber.StatusOK,
+		ResponseData: nil,
+	})
+}

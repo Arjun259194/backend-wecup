@@ -153,3 +153,25 @@ func (s *Storage) FindOnePostByIDAndDelete(ID primitive.ObjectID) error {
 
 	return nil
 }
+
+func (s *Storage) LikeOrUnlikePost(postID, clientID primitive.ObjectID, isLiked bool) error {
+	filter := bson.M{
+		"_id": postID,
+	}
+
+	var update bson.M
+
+	if isLiked {
+		update = bson.M{"$pull": bson.M{"likes": clientID}}
+	} else {
+		update = bson.M{"$push": bson.M{"likes": clientID}}
+	}
+
+	result := s.PostModel.FindOneAndUpdate(s.Ctx, filter, update)
+
+	if err := result.Err(); err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -32,4 +32,5 @@ func setPostRoutes(server *fiber.App) {
 	post.Put("/:id", controller.UpdatePostController)
 	post.Get("/:id", controller.GetPostController)
 	post.Delete("/:id", controller.DeletePostController)
+	post.Put("/:id/like", controller.LikePostController)
 }
