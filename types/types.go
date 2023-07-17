@@ -35,3 +35,7 @@ type CreatePostRequest struct {
 type UpdatePostRequest struct {
   Content string `json:"content" validate:"required"`
 }
+
+type CreateCommentRequest struct {
+  Content string `json:"content" validate:"required"`
+}

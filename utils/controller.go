@@ -16,8 +16,14 @@ func SendErrResponse(err error, message string, status int, c *fiber.Ctx) error 
 	})
 }
 
-
 func GetIDFromParams(c *fiber.Ctx) (primitive.ObjectID, error) {
 	strID := c.Params("id")
 	return primitive.ObjectIDFromHex(strID)
+}
+
+func SendOKResponse(c *fiber.Ctx, data interface{}) error {
+	return c.Status(fiber.StatusOK).JSON(types.Response{
+		Status:       fiber.StatusOK,
+		ResponseData: data,
+	})
 }

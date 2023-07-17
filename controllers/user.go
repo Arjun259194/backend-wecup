@@ -15,10 +15,7 @@ func (ctrl *Controller) GetProfile(c *fiber.Ctx) error {
 		utils.SingleUserErrorHandler(err, c)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: user.GetResponse(),
-	})
+	return utils.SendOKResponse(c, user.GetResponse())
 }
 
 func (ctrl *Controller) GetUserController(c *fiber.Ctx) error {
@@ -36,10 +33,7 @@ func (ctrl *Controller) GetUserController(c *fiber.Ctx) error {
 		utils.SingleUserErrorHandler(err, c)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: user.GetResponse(),
-	})
+	return utils.SendOKResponse(c, user.GetResponse())
 }
 
 func (ctrl *Controller) UpdateUserController(c *fiber.Ctx) error {
@@ -58,10 +52,7 @@ func (ctrl *Controller) UpdateUserController(c *fiber.Ctx) error {
 		return utils.SingleUserErrorHandler(err, c)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: nil,
-	})
+	return utils.SendOKResponse(c, nil)
 }
 
 func (ctrl *Controller) FollowUserController(c *fiber.Ctx) error {
@@ -89,8 +80,5 @@ func (ctrl *Controller) FollowUserController(c *fiber.Ctx) error {
 		return utils.SingleUserErrorHandler(err, c)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: nil,
-	})
+	return utils.SendOKResponse(c, nil)
 }

@@ -28,9 +28,7 @@ func (ctrl *Controller) CreatePostController(c *fiber.Ctx) error {
 		return utils.DatabaseInsertionHandler(c, err)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: nil})
+	return utils.SendOKResponse(c, nil)
 }
 
 func (ctrl *Controller) GetPostController(c *fiber.Ctx) error {
@@ -44,9 +42,7 @@ func (ctrl *Controller) GetPostController(c *fiber.Ctx) error {
 		return utils.SingleUserErrorHandler(err, c)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: post})
+	return utils.SendOKResponse(c, post)
 }
 
 func (ctrl *Controller) GetPostsController(c *fiber.Ctx) error {
@@ -61,10 +57,7 @@ func (ctrl *Controller) GetPostsController(c *fiber.Ctx) error {
 		return utils.FailedToDecodeDataHandler(c, err)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: posts,
-	})
+	return utils.SendOKResponse(c, posts)
 }
 
 func (ctrl *Controller) UpdatePostController(c *fiber.Ctx) error {
@@ -93,10 +86,7 @@ func (ctrl *Controller) UpdatePostController(c *fiber.Ctx) error {
 		return utils.SingleUserErrorHandler(err, c)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: nil,
-	})
+	return utils.SendOKResponse(c, nil)
 }
 
 func (ctrl *Controller) DeletePostController(c *fiber.Ctx) error {
@@ -120,10 +110,7 @@ func (ctrl *Controller) DeletePostController(c *fiber.Ctx) error {
 		return utils.SingleUserErrorHandler(err, c)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: nil,
-	})
+	return utils.SendOKResponse(c, nil)
 }
 
 func (ctrl *Controller) LikePostController(c *fiber.Ctx) error {
@@ -154,8 +141,32 @@ func (ctrl *Controller) LikePostController(c *fiber.Ctx) error {
 		return utils.SingleUserErrorHandler(err, c)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: nil,
-	})
+	return utils.SendOKResponse(c, nil)
+}
+
+func (ctrl *Controller) CreateCommentController(c *fiber.Ctx) error {
+	ID, err := utils.GetIDFromParams(c)
+	if err != nil {
+		return utils.NotValidIDHandler(c, err)
+	}
+
+	clientID := c.Locals("id").(primitive.ObjectID)
+
+	reqBody := new(types.CreateCommentRequest)
+
+	if err := c.BodyParser(reqBody); err != nil {
+		return utils.ReqBodyFailedToDecodeHandler(c, err)
+	}
+
+	if err := val.Struct(reqBody); err != nil {
+		return utils.InvalidRequestBodyHandler(c, err)
+	}
+
+	newComment := types.NewComment(clientID, ID, reqBody.Content)
+
+	if err := ctrl.Storage.CreateNewComment(ID, newComment); err != nil {
+		return utils.DatabaseInsertionHandler(c, err)
+	}
+
+	return utils.SendOKResponse(c, nil)
 }

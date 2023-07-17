@@ -30,13 +30,10 @@ func (ctrl *Controller) RegisterController(c *fiber.Ctx) error {
 	newUser := types.NewUser(reqBodyStruct.Name, reqBodyStruct.Email, hashPass, reqBodyStruct.Gender)
 
 	if err := ctrl.Storage.CreateNewUser(newUser); err != nil {
-    return utils.DatabaseInsertionHandler(c,err)
+		return utils.DatabaseInsertionHandler(c, err)
 	}
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status:       fiber.StatusOK,
-		ResponseData: nil,
-	})
+	return utils.SendOKResponse(c, nil)
 }
 
 func (ctrl *Controller) LoginController(c *fiber.Ctx) error {
@@ -69,11 +66,8 @@ func (ctrl *Controller) LoginController(c *fiber.Ctx) error {
 
 	c.Cookie(cookie)
 
-	return c.Status(fiber.StatusOK).JSON(types.Response{
-		Status: fiber.StatusOK,
-		ResponseData: fiber.Map{
-			"token": token,
-		},
+	return utils.SendOKResponse(c, fiber.Map{
+		"token": token,
 	})
 }
 

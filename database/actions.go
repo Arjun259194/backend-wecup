@@ -37,16 +37,10 @@ func (s *Storage) FindOneUser(filter bson.M) (*types.User, error) {
 }
 
 func (s *Storage) FindByIDAndUpdateUser(ID primitive.ObjectID, body types.UserUpdateRequest) error {
-	filter := bson.M{
-		"_id": ID,
-	}
+	filter := bson.M{"_id": ID}
 
 	update := bson.M{
-		"$set": bson.M{
-			"name":   body.Name,
-			"email":  body.Email,
-			"gender": body.Gender,
-		},
+		"$set": bson.M{"name": body.Name, "email": body.Email, "gender": body.Gender},
 	}
 
 	result := s.UserModel.FindOneAndUpdate(s.Ctx, filter, update)
@@ -73,13 +67,9 @@ func (s *Storage) FindByIDAndFollowOrUnfollow(userID, clientID primitive.ObjectI
 		clientUpdateQuery = bson.M{"$push": bson.M{"following": userID}}
 	}
 
-	clientFilter := bson.M{
-		"_id": clientID,
-	}
+	clientFilter := bson.M{"_id": clientID}
 
-	userFilter := bson.M{
-		"_id": userID,
-	}
+	userFilter := bson.M{"_id": userID}
 
 	result := s.UserModel.FindOneAndUpdate(s.Ctx, clientFilter, clientUpdateQuery)
 	if err := result.Err(); err != nil {
@@ -103,9 +93,7 @@ func (s *Storage) CreateNewPost(p types.Post) error {
 }
 
 func (s *Storage) FindOnePostByID(ID primitive.ObjectID) (*types.Post, error) {
-	filter := bson.M{
-		"_id": ID,
-	}
+	filter := bson.M{"_id": ID}
 
 	resutl := s.PostModel.FindOne(s.Ctx, filter)
 
@@ -122,14 +110,10 @@ func (s *Storage) FindOnePostByID(ID primitive.ObjectID) (*types.Post, error) {
 }
 
 func (s *Storage) FindOnePostByIDAndUpdate(ID primitive.ObjectID, req *types.UpdatePostRequest) error {
-	filter := bson.M{
-		"_id": ID,
-	}
+	filter := bson.M{"_id": ID}
 
 	update := bson.M{
-		"$set": bson.M{
-			"content": req.Content,
-		},
+		"$set": bson.M{"content": req.Content},
 	}
 
 	result := s.PostModel.FindOneAndUpdate(s.Ctx, filter, update)
@@ -141,9 +125,7 @@ func (s *Storage) FindOnePostByIDAndUpdate(ID primitive.ObjectID, req *types.Upd
 }
 
 func (s *Storage) FindOnePostByIDAndDelete(ID primitive.ObjectID) error {
-	filter := bson.M{
-		"_id": ID,
-	}
+	filter := bson.M{"_id": ID}
 
 	result := s.PostModel.FindOneAndDelete(s.Ctx, filter)
 
@@ -155,9 +137,7 @@ func (s *Storage) FindOnePostByIDAndDelete(ID primitive.ObjectID) error {
 }
 
 func (s *Storage) LikeOrUnlikePost(postID, clientID primitive.ObjectID, isLiked bool) error {
-	filter := bson.M{
-		"_id": postID,
-	}
+	filter := bson.M{"_id": postID}
 
 	var update bson.M
 
@@ -169,6 +149,21 @@ func (s *Storage) LikeOrUnlikePost(postID, clientID primitive.ObjectID, isLiked 
 
 	result := s.PostModel.FindOneAndUpdate(s.Ctx, filter, update)
 
+	if err := result.Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Storage) CreateNewComment(postID primitive.ObjectID, comment *types.Comment) error {
+	filter := bson.M{"_id": postID}
+
+	update := bson.M{
+		"$push": bson.M{"comments": comment},
+	}
+
+	result := s.PostModel.FindOneAndUpdate(s.Ctx, filter, update)
 	if err := result.Err(); err != nil {
 		return err
 	}
