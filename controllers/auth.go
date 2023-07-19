@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/Arjun259194/wecup-go/types"
 	"github.com/Arjun259194/wecup-go/utils"
@@ -10,6 +11,7 @@ import (
 )
 
 func (ctrl *Controller) RegisterController(c *fiber.Ctx) error {
+  fmt.Println("Register point reached")
 	reqBody := c.Body()
 
 	var reqBodyStruct types.RegisterRequest
